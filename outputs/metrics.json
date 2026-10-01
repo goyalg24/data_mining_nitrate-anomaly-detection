@@ -1,0 +1,14 @@
+{
+  "TP": 110,
+  "FP": 5331,
+  "FN": 31,
+  "TN": 25318,
+  "P (total anomalies)": 141,
+  "N (total normals)": 30649,
+  "normal_accuracy (TN/N)": 0.826062840549447,
+  "anomaly_accuracy (TP/P)": 0.7801418439716312,
+  "W": 500,
+  "q": 88.0,
+  "rule": "one-sided upper tail: x >= T_i",
+  "n_points": 30790
+}
