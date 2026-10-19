@@ -14,14 +14,15 @@ Method
 
 Usage
 -----
-    python anomaly_detection.py                   # W=500, q=88 (chosen settings)
-    python anomaly_detection.py --W 750 --q 85    # try other settings
-    python anomaly_detection.py --no-sweep        # skip the W/q sensitivity sweep
+    python src/anomaly_detection.py                   # W=500, q=88 (chosen settings)
+    python src/anomaly_detection.py --W 750 --q 85    # try other settings
+    python src/anomaly_detection.py --no-sweep        # skip the W/q sensitivity sweep
 """
 
 import argparse
 import json
 import os
+from pathlib import Path
 
 import matplotlib
 
@@ -31,10 +32,13 @@ import numpy as np
 import pandas as pd
 from numpy.lib.stride_tricks import sliding_window_view
 
-DATA_FILE = "AG_NO3_fill_cells_remove_NAN.csv"
+# Paths are resolved relative to the repository root (parent of src/),
+# so the script works no matter which directory it is run from.
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DATA_FILE = REPO_ROOT / "data" / "AG_NO3_fill_cells_remove_NAN.csv"
 VALUE_COL = "NO3N"          # Nitrate column
 TRUTH_COL = "Student_Flag"  # ground truth: 1 = anomaly, 0 = normal
-OUT_DIR = "outputs"
+OUT_DIR = REPO_ROOT / "outputs"
 
 
 # ----------------------------------------------------------------------------
@@ -260,7 +264,7 @@ def main():
     print(f"P = {metrics['P (total anomalies)']}   N = {metrics['N (total normals)']}")
     print(f"Normal  accuracy (TN/N) = {metrics['normal_accuracy (TN/N)']:.2%}")
     print(f"Anomaly accuracy (TP/P) = {metrics['anomaly_accuracy (TP/P)']:.2%}")
-    print(f"Outputs written to ./{OUT_DIR}/")
+    print(f"Outputs written to {OUT_DIR}/")
 
 
 if __name__ == "__main__":

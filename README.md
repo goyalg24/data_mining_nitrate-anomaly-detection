@@ -1,7 +1,7 @@
 # Nitrate Anomaly Detection — Sliding-Window Percentile Thresholding
 
 Threshold-based anomaly detection on the Nitrate (`NO3N`) time series in
-`AG_NO3_fill_cells_remove_NAN.csv`, using fixed-size, overlapping sliding windows
+`data/AG_NO3_fill_cells_remove_NAN.csv`, using fixed-size, overlapping sliding windows
 (step = 1) and an adaptive q-percentile threshold. No supervised models are used;
 the ground-truth column `Student_Flag` (141 anomalies) is used **only** for evaluation.
 
@@ -75,7 +75,7 @@ is saved in `outputs/sensitivity_sweep.csv`.
 * **NaNs:** the provided cleaned file has no missing values (30,790 rows); the script
   still calls `dropna` on `NO3N` as a safeguard. No other filtering or transformation.
 * **Implementation check:** the main detector is an explicit loop over windows
-  (`sliding_window_detect`). A vectorised version (`sliding_window_detect_fast`, using
+  (`sliding_window_detect` in `src/anomaly_detection.py`). A vectorised version (`sliding_window_detect_fast`, using
   `sliding_window_view` + `np.percentile(..., axis=1, method="linear")`) is used for the
   W/q sweep, and the script asserts both give identical predictions.
 
@@ -88,19 +88,41 @@ is saved in `outputs/sensitivity_sweep.csv`.
 
 ## How to run
 
+Requires Python 3 (NumPy ≥ 1.22 for `np.percentile(..., method=...)`).
+
 ```bash
 pip install -r requirements.txt
-python anomaly_detection.py                 # W=500, q=88 (default, ~1 min)
-python anomaly_detection.py --W 750 --q 85  # other settings
-python anomaly_detection.py --no-sweep      # skip the sensitivity sweep
+python src/anomaly_detection.py                 # W=500, q=88 (default, ~1 min)
+python src/anomaly_detection.py --W 750 --q 85  # other settings
+python src/anomaly_detection.py --no-sweep      # skip the sensitivity sweep
 ```
+
+The script resolves `data/` and `outputs/` relative to the repository root, so it
+can be run from any working directory. Use `--data <path>` to point at another CSV
+with the same columns.
 
 ## Repository contents
 
+```
+.
+├── data/
+│   └── AG_NO3_fill_cells_remove_NAN.csv
+├── outputs/
+│   ├── anomalies_plot.png
+│   ├── metrics.json
+│   ├── predictions.csv
+│   ├── sensitivity_W_q.png
+│   └── sensitivity_sweep.csv
+├── src/
+│   └── anomaly_detection.py
+├── requirements.txt
+└── README.md
+```
+
 | File | Description |
 |---|---|
-| `anomaly_detection.py` | Loads CSV, runs sliding-window thresholding, outputs predictions, metrics and plots |
-| `AG_NO3_fill_cells_remove_NAN.csv` | Input data (Date, NO3N, Student_Flag) |
+| `src/anomaly_detection.py` | Loads CSV, runs sliding-window thresholding, outputs predictions, metrics and plots |
+| `data/AG_NO3_fill_cells_remove_NAN.csv` | Input data (Date, NO3N, Student_Flag) |
 | `outputs/predictions.csv` | Original data + threshold used + `Predicted_Anomaly` (0/1) |
 | `outputs/metrics.json` | TP, FP, FN, TN, P, N, normal and anomaly accuracy |
 | `outputs/anomalies_plot.png` | Time series with detected anomalies highlighted |
